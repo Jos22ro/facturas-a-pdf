@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#4f46e5" />
+  <meta name="description" content="Revisa y selecciona las facturas que quieres imprimir." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="FacturaPrint" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-primary-fixed": "#0f0069", "primary-fixed": "#e2dfff", outline: "#777587", "on-tertiary-fixed-variant": "#004e5c", "primary-fixed-dim": "#c3c0ff", surface: "#f8f9ff", "error-container": "#ffdad6", "on-tertiary-container": "#93e8ff", "surface-dim": "#cbdbf5", primary: "#3525cd", "on-secondary-fixed-variant": "#5a00c6", "on-secondary": "#ffffff", "inverse-on-surface": "#eaf1ff", "on-primary-container": "#dad7ff", "on-tertiary-fixed": "#001f26", "tertiary-fixed": "#acedff", "primary-container": "#4f46e5", "outline-variant": "#c7c4d8", "surface-container-lowest": "#ffffff", "on-surface-variant": "#464555", "surface-bright": "#f8f9ff", "secondary-container": "#8a4cfc", "tertiary-fixed-dim": "#4cd7f6", "surface-container-highest": "#d3e4fe", "on-secondary-fixed": "#25005a", "inverse-primary": "#c3c0ff", "on-secondary-container": "#fffbff", "surface-container-high": "#dce9ff", background: "#f8f9ff", "on-surface": "#0b1c30", "tertiary-container": "#006a7c", "surface-tint": "#4d44e3", "surface-container-low": "#eff4ff", "on-background": "#0b1c30", error: "#ba1a1a", "on-error": "#ffffff", "on-primary-fixed-variant": "#3323cc", secondary: "#712ae2", "secondary-fixed-dim": "#d2bbff", "on-tertiary": "#ffffff", "surface-variant": "#d3e4fe", "on-error-container": "#93000a", tertiary: "#00505f", "secondary-fixed": "#eaddff", "surface-container": "#e5eeff", "inverse-surface": "#213145", "on-primary": "#ffffff" }, borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" }, spacing: { "space-lg": "1.5rem", "space-md": "1rem", "space-sm": "0.5rem", gutter: "0.75rem", "margin-desktop": "2rem", "space-xl": "2rem", "gutter-desktop": "1rem", margin: "1rem", "margin-mobile": "1rem", "space-xs": "0.25rem", "gutter-mobile": "0.5rem" }, fontFamily: { "body-sm": ["Inter"], "headline-lg-mobile": ["Plus Jakarta Sans"], "body-md": ["Inter"], "label-sm": ["Inter"], "headline-xl-mobile": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "headline-xl": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "label-lg": ["Inter"], "label-md": ["Inter"] }, fontSize: { "body-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }], "headline-lg-mobile": ["24px", { lineHeight: "30px", letterSpacing: "-0.02em", fontWeight: "700" }], "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }], "label-sm": ["10px", { lineHeight: "12px", letterSpacing: "0.04em", fontWeight: "700" }], "headline-xl-mobile": ["28px", { lineHeight: "34px", letterSpacing: "-0.025em", fontWeight: "800" }], "headline-md": ["20px", { lineHeight: "26px", letterSpacing: "-0.015em", fontWeight: "600" }], "headline-xl": ["36px", { lineHeight: "44px", letterSpacing: "-0.03em", fontWeight: "800" }], "headline-lg": ["30px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }], "headline-sm": ["16px", { lineHeight: "22px", letterSpacing: "-0.01em", fontWeight: "600" }], "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }], "label-lg": ["14px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "600" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }] } } } };</script>
+  <style>
+    @layer base {
+      html, body { width: 100%; margin: 0; padding: 0; }
+      body { min-height: 100dvh; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+      .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    @keyframes fp-pop { 0% { transform: scale(0.6); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+    .fp-pop { animation: fp-pop 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
+    @keyframes fp-in { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .fp-in { animation: fp-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  </style>
+  <title>Revisión y selección</title>
+</head>
+<body class="bg-surface font-body-md text-on-surface flex flex-col min-h-[100dvh]">
+  <header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl pt-safe border-b border-surface-container">
+    <div class="h-14 px-gutter flex items-center justify-between gap-2">
+      <button type="button" aria-label="Volver" onclick="window.location.href='index.html'"
+        class="w-10 h-10 min-h-[44px] min-w-[44px] -ml-2 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors active:scale-95">
+        <span class="material-symbols-outlined text-[24px]">arrow_back</span>
+      </button>
+      <h1 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight truncate">Revisión y selección</h1>
+      <button type="button" id="toggle-all-btn"
+        class="font-label-md text-label-md text-primary font-semibold py-1.5 px-2 rounded-lg hover:bg-surface-container transition-colors active:scale-95 shrink-0">
+        Deseleccionar todas
+      </button>
+    </div>
+  </header>
+
+  <main class="flex flex-col relative w-full pt-14 bg-surface min-h-[100dvh]">
+    <div id="notice" class="hidden mx-gutter mt-3 font-body-sm text-body-sm text-on-surface-variant bg-surface-container rounded-xl px-3 py-2"></div>
+
+    <div class="flex flex-col w-full pb-28 pt-2">
+      <div class="p-gutter">
+        <div id="grid" class="grid grid-cols-2 gap-3"></div>
+
+        <div id="empty" class="hidden flex-col items-center text-center px-6 py-16">
+          <div class="w-16 h-16 rounded-2xl bg-surface-container-low flex items-center justify-center text-primary mb-4">
+            <span class="material-symbols-outlined text-[32px]">folder_open</span>
+          </div>
+          <h2 class="font-headline-md text-headline-md text-on-surface tracking-tight mb-1">No hay facturas</h2>
+          <p class="font-body-md text-body-md text-on-surface-variant max-w-[240px] mb-6">Vuelve a la pantalla de carga para elegir tus archivos.</p>
+          <button type="button" onclick="window.location.href='index.html'"
+            class="h-12 px-8 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-all">
+            <span class="material-symbols-outlined text-[20px]">upload_file</span>
+            <span>Elegir facturas</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="fixed bottom-0 inset-x-0 z-40 bg-surface/95 backdrop-blur-xl pb-safe border-t border-surface-container shadow-[0_-4px_20px_rgba(11,28,48,0.06)]">
+      <div class="px-gutter py-3.5 flex items-center justify-between gap-4">
+        <div class="flex flex-col min-w-0">
+          <span id="selected-summary" class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight truncate">0 facturas seleccionadas</span>
+        </div>
+        <button type="button" id="submit-print-btn"
+          class="h-12 px-8 bg-primary rounded-xl text-on-primary font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-2 shadow-md hover:bg-primary-container active:scale-95 transition-all shrink-0">
+          <span class="material-symbols-outlined text-[22px]">print</span>
+          <span>Imprimir (<span id="print-count">0</span>)</span>
+        </button>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    function invoiceThumb(index) {
+      const folio = "F-" + (1042 + index * 13);
+      const total = (145.5 + index * 63.25).toFixed(2);
+      const rows = [0, 1, 2].map((row) =>
+        '<rect x="86" y="' + (150 + row * 34) + '" width="' + (128 - row * 24) + '" height="10" rx="5" fill="#dce9ff"/>'
+      ).join("");
+      const bars = [0, 1, 2, 3, 4, 5, 6, 7].map((bar) =>
+        '<rect x="' + (92 + bar * 15) + '" y="316" width="' + (bar % 2 ? 4 : 8) + '" height="26" fill="#0b1c30"/>'
+      ).join("");
+      const svg =
+        '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400">' +
+        '<rect width="300" height="400" fill="#eef2ff"/>' +
+        '<rect x="40" y="24" width="220" height="352" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>' +
+        '<rect x="40" y="24" width="220" height="58" rx="10" fill="#4f46e5"/>' +
+        '<rect x="40" y="70" width="220" height="12" fill="#4f46e5"/>' +
+        '<text x="60" y="60" font-family="Inter,Arial,sans-serif" font-size="17" font-weight="700" fill="#ffffff">FACTURA</text>' +
+        '<text x="242" y="60" text-anchor="end" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="600" fill="#c7d2fe">' + folio + "</text>" +
+        '<rect x="86" y="106" width="96" height="10" rx="5" fill="#c7c4d8"/>' +
+        rows +
+        '<text x="86" y="278" font-family="Inter,Arial,sans-serif" font-size="12" font-weight="600" fill="#777587">TOTAL</text>' +
+        '<text x="86" y="304" font-family="Inter,Arial,sans-serif" font-size="24" font-weight="800" fill="#3525cd">$' + total + "</text>" +
+        bars +
+        "</svg>";
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
+
+    function loadFiles() {
+      try {
+        const raw = sessionStorage.getItem("fp_files");
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) && parsed.length ? parsed : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function demoFiles() {
+      return Array.from({ length: 6 }, (_, index) => ({
+        name: "factura-" + (index + 1) + ".jpg",
+        thumb: invoiceThumb(index),
+        demo: true
+      }));
+    }
+
+    const files = loadFiles() || demoFiles();
+    const isDemo = !loadFiles();
+    const grid = document.getElementById("grid");
+    const empty = document.getElementById("empty");
+    const notice = document.getElementById("notice");
+
+    let selection = {};
+    try {
+      const saved = JSON.parse(sessionStorage.getItem("fp_sel") || "null");
+      if (saved && typeof saved === "object") selection = saved;
+    } catch (e) {}
+
+    files.forEach((file, index) => {
+      const id = "card-" + index;
+      if (!(id in selection)) selection[id] = file.demo ? index % 3 !== 2 : true;
+    });
+
+    if (isDemo) {
+      const savedNotice = sessionStorage.getItem("fp_notice");
+      notice.textContent = savedNotice || "Vista previa de demostración: selecciona un lote para probar el flujo.";
+      notice.classList.remove("hidden");
+    } else if (sessionStorage.getItem("fp_notice")) {
+      notice.textContent = sessionStorage.getItem("fp_notice");
+      notice.classList.remove("hidden");
+      sessionStorage.removeItem("fp_notice");
+    }
+
+    function persistSelection() {
+      try {
+        sessionStorage.setItem("fp_sel", JSON.stringify(selection));
+      } catch (e) {}
+    }
+
+    function cardMarkup(file, index) {
+      const id = "card-" + index;
+      const selected = selection[id];
+      const badge = selected
+        ? 'absolute top-3 right-3 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md transition-transform scale-100'
+        : 'absolute top-3 right-3 w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur-md border border-white/60 text-transparent flex items-center justify-center shadow-md transition-transform scale-95';
+      const card = selected
+        ? "relative aspect-[3/4] w-full rounded-2xl overflow-hidden shadow-sm bg-surface-container transition-all duration-200 text-left focus:outline-none active:scale-[0.98] ring-2 ring-primary ring-offset-2 ring-offset-surface"
+        : "relative aspect-[3/4] w-full rounded-2xl overflow-hidden shadow-sm bg-surface-container transition-all duration-200 text-left focus:outline-none active:scale-[0.98] opacity-50";
+      const label = (file.name || "Factura " + (index + 1)).replace(/[<>&]/g, "");
+      return (
+        '<button type="button" id="' + id + '" class="' + card + ' fp-in" style="animation-delay:' + index * 45 + 'ms" onclick="toggleSelect(\'' + id + '\')" aria-pressed="' + selected + '" aria-label="' + label + '">' +
+        '<img class="w-full h-full object-cover transition-opacity duration-200" alt="' + label + '" src="' + file.thumb + '" loading="lazy" />' +
+        '<div class="select-badge ' + badge + '"><span class="material-symbols-outlined text-[20px] font-bold' + (selected ? "" : " hidden") + '">check</span></div>' +
+        "</button>"
+      );
+    }
+
+    function render() {
+      if (!files.length) {
+        grid.innerHTML = "";
+        empty.classList.remove("hidden");
+        empty.classList.add("flex");
+      } else {
+        grid.innerHTML = files.map(cardMarkup).join("");
+      }
+      updateUI();
+    }
+
+    function updateUI() {
+      const total = files.length;
+      const selectedCount = files.filter((file, index) => selection["card-" + index]).length;
+      const summary = document.getElementById("selected-summary");
+      summary.textContent = selectedCount === 1 ? "1 factura seleccionada" : selectedCount + " facturas seleccionadas";
+
+      const toggleBtn = document.getElementById("toggle-all-btn");
+      toggleBtn.textContent = selectedCount === 0 || selectedCount === total ? "Seleccionar todas" : "Deseleccionar todas";
+
+      const printCount = document.getElementById("print-count");
+      printCount.textContent = selectedCount;
+
+      const submitBtn = document.getElementById("submit-print-btn");
+      if (selectedCount === 0) submitBtn.classList.add("opacity-40", "pointer-events-none");
+      else submitBtn.classList.remove("opacity-40", "pointer-events-none");
+    }
+
+    function toggleSelect(id) {
+      selection[id] = !selection[id];
+      persistSelection();
+
+      const card = document.getElementById(id);
+      if (!card) return;
+      const badge = card.querySelector(".select-badge");
+      const checkIcon = badge ? badge.querySelector("span") : null;
+      const isSelected = selection[id];
+
+      if (isSelected) {
+        card.classList.remove("opacity-50");
+        card.classList.add("ring-2", "ring-primary", "ring-offset-2", "ring-offset-surface");
+        if (badge) {
+          badge.className = "select-badge absolute top-3 right-3 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md transition-transform scale-100 fp-pop";
+        }
+        if (checkIcon) checkIcon.classList.remove("hidden");
+      } else {
+        card.classList.add("opacity-50");
+        card.classList.remove("ring-2", "ring-primary", "ring-offset-2", "ring-offset-surface");
+        if (badge) {
+          badge.className = "select-badge absolute top-3 right-3 w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur-md border border-white/60 text-transparent flex items-center justify-center shadow-md transition-transform scale-95";
+        }
+        if (checkIcon) checkIcon.classList.add("hidden");
+      }
+
+      card.setAttribute("aria-pressed", String(isSelected));
+      updateUI();
+    }
+
+    document.getElementById("toggle-all-btn").addEventListener("click", () => {
+      const selectedCount = files.filter((file, index) => selection["card-" + index]).length;
+      const target = !(selectedCount > 0 && selectedCount < files.length);
+      files.forEach((file, index) => {
+        const id = "card-" + index;
+        if (selection[id] !== target) toggleSelect(id);
+      });
+    });
+
+    document.getElementById("submit-print-btn").addEventListener("click", () => {
+      const selectedCount = files.filter((file, index) => selection["card-" + index]).length;
+      if (!selectedCount) return;
+      persistSelection();
+      const btn = document.getElementById("submit-print-btn");
+      btn.classList.add("opacity-70", "pointer-events-none");
+      window.location.href = "procesando.html";
+    });
+
+    render();
+  </script>
+</body>
+</html>

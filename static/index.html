@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#4f46e5" />
+  <meta name="description" content="Carga, revisa e imprime tus facturas desde tu teléfono." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="FacturaPrint" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-primary-fixed": "#0f0069", "primary-fixed": "#e2dfff", outline: "#777587", "on-tertiary-fixed-variant": "#004e5c", "primary-fixed-dim": "#c3c0ff", surface: "#f8f9ff", "error-container": "#ffdad6", "on-tertiary-container": "#93e8ff", "surface-dim": "#cbdbf5", primary: "#3525cd", "on-secondary-fixed-variant": "#5a00c6", "on-secondary": "#ffffff", "inverse-on-surface": "#eaf1ff", "on-primary-container": "#dad7ff", "on-tertiary-fixed": "#001f26", "tertiary-fixed": "#acedff", "primary-container": "#4f46e5", "outline-variant": "#c7c4d8", "surface-container-lowest": "#ffffff", "on-surface-variant": "#464555", "surface-bright": "#f8f9ff", "secondary-container": "#8a4cfc", "tertiary-fixed-dim": "#4cd7f6", "surface-container-highest": "#d3e4fe", "on-secondary-fixed": "#25005a", "inverse-primary": "#c3c0ff", "on-secondary-container": "#fffbff", "surface-container-high": "#dce9ff", background: "#f8f9ff", "on-surface": "#0b1c30", "tertiary-container": "#006a7c", "surface-tint": "#4d44e3", "surface-container-low": "#eff4ff", "on-background": "#0b1c30", error: "#ba1a1a", "on-error": "#ffffff", "on-primary-fixed-variant": "#3323cc", secondary: "#712ae2", "secondary-fixed-dim": "#d2bbff", "on-tertiary": "#ffffff", "surface-variant": "#d3e4fe", "on-error-container": "#93000a", tertiary: "#00505f", "secondary-fixed": "#eaddff", "surface-container": "#e5eeff", "inverse-surface": "#213145", "on-primary": "#ffffff" }, borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" }, spacing: { "space-lg": "1.5rem", "space-md": "1rem", "space-sm": "0.5rem", gutter: "0.75rem", "margin-desktop": "2rem", "space-xl": "2rem", "gutter-desktop": "1rem", margin: "1rem", "margin-mobile": "1rem", "space-xs": "0.25rem", "gutter-mobile": "0.5rem" }, fontFamily: { "body-sm": ["Inter"], "headline-lg-mobile": ["Plus Jakarta Sans"], "body-md": ["Inter"], "label-sm": ["Inter"], "headline-xl-mobile": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "headline-xl": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "label-lg": ["Inter"], "label-md": ["Inter"] }, fontSize: { "body-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }], "headline-lg-mobile": ["24px", { lineHeight: "30px", letterSpacing: "-0.02em", fontWeight: "700" }], "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }], "label-sm": ["10px", { lineHeight: "12px", letterSpacing: "0.04em", fontWeight: "700" }], "headline-xl-mobile": ["28px", { lineHeight: "34px", letterSpacing: "-0.025em", fontWeight: "800" }], "headline-md": ["20px", { lineHeight: "26px", letterSpacing: "-0.015em", fontWeight: "600" }], "headline-xl": ["36px", { lineHeight: "44px", letterSpacing: "-0.03em", fontWeight: "800" }], "headline-lg": ["30px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }], "headline-sm": ["16px", { lineHeight: "22px", letterSpacing: "-0.01em", fontWeight: "600" }], "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }], "label-lg": ["14px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "600" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }] } } } };</script>
+  <style>
+    @layer base {
+      html, body { width: 100%; margin: 0; padding: 0; }
+      body { min-height: 100dvh; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+      .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    @keyframes fp-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .fp-rise { animation: fp-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+    @keyframes fp-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+    .fp-shake { animation: fp-shake 0.3s ease-in-out; }
+  </style>
+  <title>Impresión de facturas</title>
+</head>
+<body class="bg-surface font-body-md text-on-surface flex flex-col min-h-[100dvh]">
+  <header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.02)]">
+    <div class="h-16 px-margin flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center text-on-primary shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+        </div>
+        <h1 class="font-headline-md text-headline-md text-on-surface tracking-tight">Impresión de facturas</h1>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex flex-col flex-1 relative w-full pt-16 bg-surface items-center justify-center px-margin">
+    <input type="file" id="file-input" class="hidden" multiple accept="image/png,image/jpeg,image/heic,image/heif,application/pdf,.jpg,.jpeg,.png,.heic,.heif,.pdf" />
+
+    <div class="w-full max-w-sm flex flex-col items-center my-auto">
+      <div id="drop-zone"
+        class="w-full relative group cursor-pointer overflow-hidden rounded-3xl border-2 border-dashed border-outline-variant/60 hover:border-primary/60 bg-surface-container-low/70 hover:bg-surface-container-low p-8 sm:p-10 flex flex-col items-center justify-center text-center transition-all duration-300 active:scale-[0.99] shadow-sm hover:shadow-md fp-rise"
+        role="button" tabindex="0" aria-label="Elegir facturas">
+        <div class="absolute -top-14 -right-14 w-36 h-36 rounded-full bg-primary-fixed-dim/25 blur-2xl pointer-events-none"></div>
+        <div class="absolute -bottom-12 -left-12 w-32 h-32 rounded-full bg-secondary-fixed/30 blur-2xl pointer-events-none"></div>
+
+        <div class="relative w-20 h-20 rounded-2xl bg-surface-container-lowest shadow-sm flex items-center justify-center text-primary mb-6 group-hover:scale-105 transition-transform">
+          <span class="material-symbols-outlined text-[40px]">upload_file</span>
+        </div>
+
+        <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight mb-2">Sube tus facturas</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant max-w-[220px] mb-6">Arrastra o toca para seleccionar tus facturas</p>
+
+        <button id="cta-btn" type="button"
+          class="w-full h-12 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-sm hover:bg-primary/95 active:scale-95 transition-all">
+          <span class="material-symbols-outlined text-[20px]">description</span>
+          <span id="cta-label">Elegir facturas</span>
+        </button>
+
+        <div class="mt-6 flex items-center gap-1.5 text-on-surface-variant font-label-sm text-label-sm">
+          <span class="material-symbols-outlined text-[15px] text-primary/70">check_circle</span>
+          <span>JPG, PNG, HEIC o PDF · máx. 25 MB por archivo</span>
+        </div>
+      </div>
+
+      <p id="error-msg" class="hidden mt-4 w-full text-center font-body-md text-body-md text-error bg-error-container rounded-xl px-4 py-3"></p>
+    </div>
+  </main>
+
+  <script>
+    const MAX_BYTES = 25 * 1024 * 1024;
+    const ACCEPT_RE = /\.(jpe?g|png|heic|heif|pdf|webp)$/i;
+    const input = document.getElementById("file-input");
+    const dropZone = document.getElementById("drop-zone");
+    const ctaBtn = document.getElementById("cta-btn");
+    const ctaLabel = document.getElementById("cta-label");
+    const errorMsg = document.getElementById("error-msg");
+
+    function showError(text) {
+      errorMsg.textContent = text;
+      errorMsg.classList.remove("hidden");
+      dropZone.classList.add("fp-shake");
+      setTimeout(() => dropZone.classList.remove("fp-shake"), 320);
+    }
+
+    function hideError() {
+      errorMsg.classList.add("hidden");
+    }
+
+    function loadImg(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
+
+    function drawThumb(img) {
+      const max = 640;
+      let w = img.naturalWidth || img.width;
+      let h = img.naturalHeight || img.height;
+      if (!w || !h) throw new Error("bad image");
+      const scale = Math.min(1, max / Math.max(w, h));
+      w = Math.round(w * scale);
+      h = Math.round(h * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+      return canvas.toDataURL("image/jpeg", 0.72);
+    }
+
+    function docThumb(label) {
+      const badge = label || "DOC";
+      const svg =
+        '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400">' +
+        '<rect width="300" height="400" fill="#eef2ff"/>' +
+        '<rect x="58" y="46" width="184" height="308" rx="10" fill="#ffffff" stroke="#c7c4d8" stroke-width="2"/>' +
+        '<rect x="86" y="96" width="128" height="10" rx="5" fill="#c7c4d8"/>' +
+        '<rect x="86" y="124" width="96" height="10" rx="5" fill="#dce9ff"/>' +
+        '<rect x="86" y="152" width="112" height="10" rx="5" fill="#dce9ff"/>' +
+        '<rect x="86" y="180" width="80" height="10" rx="5" fill="#dce9ff"/>' +
+        '<rect x="86" y="236" width="128" height="34" rx="8" fill="#4f46e5"/>' +
+        '<text x="150" y="300" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="30" font-weight="700" fill="#3525cd">' + badge + "</text>" +
+        "</svg>";
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
+
+    async function fileToEntry(file) {
+      const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+      if (isPdf) return { name: file.name, pdf: true, thumb: docThumb("PDF") };
+      try {
+        const url = URL.createObjectURL(file);
+        const img = await loadImg(url);
+        URL.revokeObjectURL(url);
+        return { name: file.name, thumb: drawThumb(img) };
+      } catch (e) {
+        return { name: file.name, thumb: docThumb("IMG"), broken: true };
+      }
+    }
+
+    function persist(entries) {
+      try {
+        sessionStorage.setItem("fp_files", JSON.stringify(entries));
+        sessionStorage.removeItem("fp_sel");
+        return true;
+      } catch (e) {
+        const light = entries.map((entry) =>
+          entry.pdf
+            ? { name: entry.name, pdf: true, thumb: docThumb("PDF") }
+            : { name: entry.name, thumb: docThumb("IMG") }
+        );
+        try {
+          sessionStorage.setItem("fp_files", JSON.stringify(light));
+          sessionStorage.removeItem("fp_sel");
+          return true;
+        } catch (e2) {
+          return false;
+        }
+      }
+    }
+
+    async function handleFiles(fileList) {
+      const files = Array.from(fileList || []);
+      if (!files.length) return;
+      hideError();
+
+      const valid = [];
+      let oversized = 0;
+      let invalid = 0;
+
+      for (const file of files) {
+        const okType = ACCEPT_RE.test(file.name) || /^image\//.test(file.type) || file.type === "application/pdf";
+        if (!okType) { invalid += 1; continue; }
+        if (file.size > MAX_BYTES) { oversized += 1; continue; }
+        valid.push(file);
+      }
+
+      if (!valid.length) {
+        showError(oversized ? "Archivo mayor a 25 MB. Elige archivos más pequeños." : "Formato no admitido. Usa JPG, PNG, HEIC o PDF.");
+        return;
+      }
+
+      ctaBtn.classList.add("opacity-70", "pointer-events-none");
+      ctaLabel.textContent = "Preparando...";
+
+      const entries = await Promise.all(valid.map(fileToEntry));
+      const stored = persist(entries);
+
+      ctaBtn.classList.remove("opacity-70", "pointer-events-none");
+      ctaLabel.textContent = "Elegir facturas";
+
+      if (!stored) {
+        showError("No hay espacio suficiente en el navegador para tantos archivos.");
+        return;
+      }
+
+      let notice = "";
+      if (oversized) notice += oversized + " archivo(s) omitidos por superar 25 MB. ";
+      if (invalid) notice += invalid + " archivo(s) con formato no admitido.";
+      if (notice) sessionStorage.setItem("fp_notice", notice.trim());
+      else sessionStorage.removeItem("fp_notice");
+
+      window.location.href = "revision.html";
+    }
+
+    ctaBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      input.click();
+    });
+
+    dropZone.addEventListener("click", () => input.click());
+    dropZone.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        input.click();
+      }
+    });
+
+    input.addEventListener("change", () => {
+      handleFiles(input.files);
+      input.value = "";
+    });
+
+    ["dragenter", "dragover"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropZone.classList.add("border-primary", "bg-surface-container");
+      });
+    });
+
+    ["dragleave", "drop"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropZone.classList.remove("border-primary", "bg-surface-container");
+      });
+    });
+
+    dropZone.addEventListener("drop", (event) => {
+      if (event.dataTransfer && event.dataTransfer.files) handleFiles(event.dataTransfer.files);
+    });
+  </script>
+</body>
+</html>

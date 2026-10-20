@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#4f46e5" />
+  <meta name="description" content="Envío de facturas a impresión." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="FacturaPrint" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-primary-fixed": "#0f0069", "primary-fixed": "#e2dfff", outline: "#777587", "on-tertiary-fixed-variant": "#004e5c", "primary-fixed-dim": "#c3c0ff", surface: "#f8f9ff", "error-container": "#ffdad6", "on-tertiary-container": "#93e8ff", "surface-dim": "#cbdbf5", primary: "#3525cd", "on-secondary-fixed-variant": "#5a00c6", "on-secondary": "#ffffff", "inverse-on-surface": "#eaf1ff", "on-primary-container": "#dad7ff", "on-tertiary-fixed": "#001f26", "tertiary-fixed": "#acedff", "primary-container": "#4f46e5", "outline-variant": "#c7c4d8", "surface-container-lowest": "#ffffff", "on-surface-variant": "#464555", "surface-bright": "#f8f9ff", "secondary-container": "#8a4cfc", "tertiary-fixed-dim": "#4cd7f6", "surface-container-highest": "#d3e4fe", "on-secondary-fixed": "#25005a", "inverse-primary": "#c3c0ff", "on-secondary-container": "#fffbff", "surface-container-high": "#dce9ff", background: "#f8f9ff", "on-surface": "#0b1c30", "tertiary-container": "#006a7c", "surface-tint": "#4d44e3", "surface-container-low": "#eff4ff", "on-background": "#0b1c30", error: "#ba1a1a", "on-error": "#ffffff", "on-primary-fixed-variant": "#3323cc", secondary: "#712ae2", "secondary-fixed-dim": "#d2bbff", "on-tertiary": "#ffffff", "surface-variant": "#d3e4fe", "on-error-container": "#93000a", tertiary: "#00505f", "secondary-fixed": "#eaddff", "surface-container": "#e5eeff", "inverse-surface": "#213145", "on-primary": "#ffffff" }, borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" }, spacing: { "space-lg": "1.5rem", "space-md": "1rem", "space-sm": "0.5rem", gutter: "0.75rem", "margin-desktop": "2rem", "space-xl": "2rem", "gutter-desktop": "1rem", margin: "1rem", "margin-mobile": "1rem", "space-xs": "0.25rem", "gutter-mobile": "0.5rem" }, fontFamily: { "body-sm": ["Inter"], "headline-lg-mobile": ["Plus Jakarta Sans"], "body-md": ["Inter"], "label-sm": ["Inter"], "headline-xl-mobile": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "headline-xl": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "label-lg": ["Inter"], "label-md": ["Inter"] }, fontSize: { "body-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }], "headline-lg-mobile": ["24px", { lineHeight: "30px", letterSpacing: "-0.02em", fontWeight: "700" }], "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }], "label-sm": ["10px", { lineHeight: "12px", letterSpacing: "0.04em", fontWeight: "700" }], "headline-xl-mobile": ["28px", { lineHeight: "34px", letterSpacing: "-0.025em", fontWeight: "800" }], "headline-md": ["20px", { lineHeight: "26px", letterSpacing: "-0.015em", fontWeight: "600" }], "headline-xl": ["36px", { lineHeight: "44px", letterSpacing: "-0.03em", fontWeight: "800" }], "headline-lg": ["30px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }], "headline-sm": ["16px", { lineHeight: "22px", letterSpacing: "-0.01em", fontWeight: "600" }], "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }], "label-lg": ["14px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "600" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }] } } } };</script>
+  <style>
+    @layer base {
+      html, body { width: 100%; margin: 0; padding: 0; }
+      body { min-height: 100dvh; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+      .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    @keyframes fp-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .fp-in { animation: fp-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+    #progress-svg-circle { transition: stroke-dashoffset 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
+    @keyframes fp-done { 0% { transform: scale(0.9); opacity: 0.6; } 100% { transform: scale(1); opacity: 1; } }
+    .fp-done { animation: fp-done 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+  </style>
+  <title>Enviando a imprimir</title>
+</head>
+<body class="bg-surface font-body-md text-on-surface flex flex-col min-h-[100dvh]">
+  <header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.02)]">
+    <div class="h-14 px-gutter flex items-center justify-between">
+      <button type="button" id="btn-back" aria-label="Volver"
+        class="w-11 h-11 min-h-[44px] min-w-[44px] -ml-2 rounded-full flex items-center justify-center text-on-surface/80 hover:text-on-surface hover:bg-surface-container-high transition-colors active:scale-95">
+        <span class="material-symbols-outlined text-[24px]">arrow_back</span>
+      </button>
+      <h1 class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight truncate max-w-[200px] text-center">Procesando impresión</h1>
+      <div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+        <span class="material-symbols-outlined text-[18px]">print</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex flex-col relative w-full pt-14 bg-surface flex-1 min-h-[100dvh]">
+    <div class="flex flex-col flex-1 w-full px-margin-mobile justify-between items-center py-space-xl relative overflow-hidden">
+      <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-gradient-to-tr from-primary-fixed/30 via-secondary-fixed/20 to-transparent blur-3xl pointer-events-none"></div>
+      <div class="w-full h-4"></div>
+
+      <div class="flex flex-col items-center justify-center text-center relative z-10 w-full max-w-sm px-4 my-auto fp-in">
+        <div class="relative w-56 h-56 flex items-center justify-center mb-8">
+          <div id="pulse-aura" class="absolute inset-2 rounded-full bg-primary-fixed/25 blur-xl animate-pulse"></div>
+          <svg class="w-full h-full transform -rotate-90 drop-shadow-sm" viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <linearGradient id="progress-gradient" x1="0%" x2="100%" y1="0%" y2="100%">
+                <stop offset="0%" stop-color="#3525cd"></stop>
+                <stop offset="100%" stop-color="#8a4cfc"></stop>
+              </linearGradient>
+            </defs>
+            <circle cx="100" cy="100" fill="none" r="82" stroke="currentColor" stroke-width="7" class="text-surface-container-highest/60"></circle>
+            <circle cx="100" cy="100" id="progress-svg-circle" fill="none" r="82" stroke="url(#progress-gradient)" stroke-width="7" stroke-linecap="round" stroke-dasharray="515.22" stroke-dashoffset="515.22"></circle>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="font-headline-xl text-4xl sm:text-5xl font-extrabold text-on-surface tracking-tight" id="progress-percent">0%</span>
+            <span class="font-label-md text-xs font-medium text-outline mt-1.5 flex items-center gap-1.5" id="progress-status">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+              <span id="progress-status-text">Enviando</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <h2 class="font-headline-md text-2xl font-bold text-on-surface tracking-tight" id="progress-title">Enviando a imprimir...</h2>
+          <p class="font-body-md text-base text-on-surface-variant max-w-[280px] mx-auto leading-relaxed" id="progress-subtitle">Preparando tus documentos en alta resolución</p>
+        </div>
+      </div>
+
+      <div class="w-full max-w-xs flex justify-center pb-safe mt-6 relative z-10">
+        <button type="button" id="btn-cancel"
+          class="h-11 px-6 rounded-full text-outline hover:text-on-surface-variant hover:bg-surface-container transition-all text-sm font-medium tracking-wide flex items-center justify-center active:scale-95">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const CIRCUMFERENCE = 2 * Math.PI * 82;
+      const circle = document.getElementById("progress-svg-circle");
+      const label = document.getElementById("progress-percent");
+      const statusText = document.getElementById("progress-status-text");
+      const title = document.getElementById("progress-title");
+      const subtitle = document.getElementById("progress-subtitle");
+      const aura = document.getElementById("pulse-aura");
+      const btnCancel = document.getElementById("btn-cancel");
+      const btnBack = document.getElementById("btn-back");
+
+      let currentPct = 0;
+      let timer = null;
+      let finished = false;
+
+      function selectedCount() {
+        try {
+          const files = JSON.parse(sessionStorage.getItem("fp_files") || "[]");
+          const selection = JSON.parse(sessionStorage.getItem("fp_sel") || "{}");
+          if (!files.length) return 0;
+          return files.filter((file, index) => selection["card-" + index] !== false).length;
+        } catch (e) {
+          return 0;
+        }
+      }
+
+      const count = selectedCount();
+      if (count > 0) {
+        subtitle.textContent = "Preparando " + count + (count === 1 ? " documento" : " documentos") + " en alta resolución";
+      }
+
+      function paint(pct) {
+        const offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
+        circle.style.strokeDashoffset = offset;
+        label.textContent = pct + "%";
+      }
+
+      function finish() {
+        finished = true;
+        clearInterval(timer);
+        paint(100);
+        statusText.textContent = "Completado";
+        title.textContent = "¡Enviado a impresión!";
+        subtitle.textContent = "Tus documentos fueron enviados correctamente.";
+        aura.classList.remove("animate-pulse");
+        label.classList.add("fp-done");
+        btnCancel.textContent = "Volver al inicio";
+        btnCancel.classList.remove("text-outline");
+        btnCancel.classList.add("text-primary", "font-semibold");
+      }
+
+      function step() {
+        if (finished) return;
+        const remaining = 100 - currentPct;
+        const inc = Math.min(remaining, currentPct < 60 ? 3 + Math.floor(Math.random() * 3) : 1 + Math.floor(Math.random() * 2));
+        currentPct += inc;
+        paint(currentPct);
+        if (currentPct >= 100) finish();
+      }
+
+      paint(0);
+      timer = setInterval(step, 220);
+
+      function goBack() {
+        if (finished) {
+          window.location.href = "index.html";
+        } else {
+          window.history.back();
+          setTimeout(function () {
+            if (document.referrer === "") window.location.href = "revision.html";
+          }, 250);
+        }
+      }
+
+      btnCancel.addEventListener("click", goBack);
+      btnBack.addEventListener("click", goBack);
+
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden && !finished) {
+          clearInterval(timer);
+        } else if (!document.hidden && !finished) {
+          clearInterval(timer);
+          timer = setInterval(step, 220);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
