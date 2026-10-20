@@ -103,39 +103,96 @@
       const btnCancel = document.getElementById("btn-cancel");
       const btnBack = document.getElementById("btn-back");
 
-      let currentPct = 0;
-      let timer = null;
-      let finished = false;
+      const DB_NAME = "facturas-db";
+      const DB_STORE = "archivos";
+      const API_URL = (function () {
+        if (location.protocol === "file:") return "http://localhost:8000/upload";
+        if (!location.port || location.port === "8000") return "/upload";
+        return location.protocol + "//" + location.hostname + ":8000/upload";
+      })();
 
-      function selectedCount() {
+      let pct = 0;
+      let state = "uploading";
+      let processingTimer = null;
+      let xhr = null;
+      let totalDocs = 0;
+
+      function paint(value) {
+        pct = value;
+        circle.style.strokeDashoffset = CIRCUMFERENCE - (value / 100) * CIRCUMFERENCE;
+        label.textContent = Math.round(value) + "%";
+      }
+
+      function selectedFiles() {
         try {
           const files = JSON.parse(sessionStorage.getItem("fp_files") || "[]");
           const selection = JSON.parse(sessionStorage.getItem("fp_sel") || "{}");
-          if (!files.length) return 0;
-          return files.filter((file, index) => selection["card-" + index] !== false).length;
+          return files
+            .map((file, index) => ({ index: index, name: file.name }))
+            .filter((file) => selection["card-" + file.index] !== false);
         } catch (e) {
-          return 0;
+          return [];
         }
       }
 
-      const count = selectedCount();
-      if (count > 0) {
-        subtitle.textContent = "Preparando " + count + (count === 1 ? " documento" : " documentos") + " en alta resolución";
+      function readBlobs(ids) {
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(DB_NAME, 1);
+          req.onupgradeneeded = () => {
+            const db = req.result;
+            if (!db.objectStoreNames.contains(DB_STORE)) {
+              db.createObjectStore(DB_STORE, { keyPath: "id" });
+            }
+          };
+          req.onerror = () => reject(req.error);
+          req.onsuccess = () => {
+            const db = req.result;
+            const store = db.transaction(DB_STORE, "readonly").objectStore(DB_STORE);
+            const out = [];
+            let pending = ids.length;
+            const done = () => {
+              db.close();
+              resolve(out.sort((a, b) => a.id - b.id));
+            };
+            if (!pending) {
+              done();
+              return;
+            }
+            ids.forEach((id) => {
+              const get = store.get(id);
+              get.onsuccess = () => {
+                if (get.result) out.push(get.result);
+                pending -= 1;
+                if (!pending) done();
+              };
+              get.onerror = () => {
+                pending -= 1;
+                if (!pending) done();
+              };
+            });
+          };
+        });
       }
 
-      function paint(pct) {
-        const offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
-        circle.style.strokeDashoffset = offset;
-        label.textContent = pct + "%";
+      function startProcessingCreep() {
+        if (processingTimer) return;
+        statusText.textContent = "Procesando";
+        subtitle.textContent = "Uniendo tus documentos en un solo PDF";
+        processingTimer = setInterval(() => {
+          if (pct < 95) paint(Math.min(95, pct + 0.8));
+        }, 160);
       }
 
-      function finish() {
-        finished = true;
-        clearInterval(timer);
+      function finishSuccess(data) {
+        state = "success";
+        clearInterval(processingTimer);
         paint(100);
         statusText.textContent = "Completado";
-        title.textContent = "¡Enviado a impresión!";
-        subtitle.textContent = "Tus documentos fueron enviados correctamente.";
+        title.textContent = "¡Enviado a imprimir!";
+        const count = data.archivos_cargados || totalDocs;
+        subtitle.textContent = count === 1
+          ? "1 documento listo para imprimir."
+          : count + " documentos listos para imprimir.";
         aura.classList.remove("animate-pulse");
         label.classList.add("fp-done");
         btnCancel.textContent = "Volver al inicio";
@@ -143,40 +200,81 @@
         btnCancel.classList.add("text-primary", "font-semibold");
       }
 
-      function step() {
-        if (finished) return;
-        const remaining = 100 - currentPct;
-        const inc = Math.min(remaining, currentPct < 60 ? 3 + Math.floor(Math.random() * 3) : 1 + Math.floor(Math.random() * 2));
-        currentPct += inc;
-        paint(currentPct);
-        if (currentPct >= 100) finish();
+      function showError(message) {
+        state = "error";
+        clearInterval(processingTimer);
+        statusText.textContent = "Error";
+        title.textContent = "No se pudo enviar";
+        subtitle.textContent = message;
+        circle.setAttribute("stroke", "#ba1a1a");
+        aura.classList.remove("animate-pulse");
+        btnCancel.textContent = "Reintentar";
+        btnCancel.classList.remove("text-outline");
+        btnCancel.classList.add("text-primary", "font-semibold");
       }
 
-      paint(0);
-      timer = setInterval(step, 220);
+      function upload(records) {
+        const form = new FormData();
+        records.forEach((record) => form.append("archivos", record.file, record.name));
 
-      function goBack() {
-        if (finished) {
+        xhr = new XMLHttpRequest();
+        xhr.open("POST", API_URL);
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable && state === "uploading") {
+            paint(Math.min(70, (event.loaded / event.total) * 70));
+          }
+        };
+        xhr.upload.onload = () => startProcessingCreep();
+        xhr.onload = () => {
+          let data = {};
+          try {
+            data = JSON.parse(xhr.responseText || "{}");
+          } catch (e) {}
+          if (xhr.status >= 200 && xhr.status < 300 && data.saved) {
+            finishSuccess(data);
+          } else {
+            showError(data.error || "El servidor respondió con estado " + xhr.status + ".");
+          }
+        };
+        xhr.onerror = () => showError("No se pudo conectar con el servidor de impresión.");
+        xhr.send(form);
+      }
+
+      function leave() {
+        if (state === "success") {
           window.location.href = "index.html";
-        } else {
-          window.history.back();
-          setTimeout(function () {
-            if (document.referrer === "") window.location.href = "revision.html";
-          }, 250);
+          return;
         }
+        if (state === "error") {
+          window.location.reload();
+          return;
+        }
+        if (xhr) xhr.abort();
+        window.location.href = "revision.html";
       }
 
-      btnCancel.addEventListener("click", goBack);
-      btnBack.addEventListener("click", goBack);
+      btnCancel.addEventListener("click", leave);
+      btnBack.addEventListener("click", leave);
 
-      document.addEventListener("visibilitychange", function () {
-        if (document.hidden && !finished) {
-          clearInterval(timer);
-        } else if (!document.hidden && !finished) {
-          clearInterval(timer);
-          timer = setInterval(step, 220);
-        }
-      });
+      const chosen = selectedFiles();
+      totalDocs = chosen.length;
+      paint(0);
+
+      if (!chosen.length) {
+        showError("No hay facturas seleccionadas. Vuelve a elegir tus archivos.");
+      } else {
+        subtitle.textContent = "Preparando " + totalDocs + (totalDocs === 1 ? " documento" : " documentos") + " en alta resolución";
+        readBlobs(chosen.map((file) => file.index))
+          .then((records) => {
+            if (!records.length) {
+              showError("Tus archivos ya no están disponibles. Vuelve a elegirlos.");
+              return;
+            }
+            totalDocs = records.length;
+            upload(records);
+          })
+          .catch(() => showError("No se pudieron leer los archivos seleccionados."));
+      }
     })();
   </script>
 </body>

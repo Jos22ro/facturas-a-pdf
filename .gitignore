@@ -8,3 +8,10 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Salida del contenedor
+salida/*
+!salida/.gitkeep
+
+# PDFs generados en local
+fotos/

@@ -88,6 +88,42 @@
     const ctaLabel = document.getElementById("cta-label");
     const errorMsg = document.getElementById("error-msg");
 
+    const DB_NAME = "facturas-db";
+    const DB_STORE = "archivos";
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(DB_STORE)) {
+            db.createObjectStore(DB_STORE, { keyPath: "id" });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function storeFiles(files) {
+      const db = await openDB();
+      try {
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction(DB_STORE, "readwrite");
+          const store = tx.objectStore(DB_STORE);
+          store.clear();
+          files.forEach((file, index) => {
+            store.put({ id: index, name: file.name, type: file.type || "", file });
+          });
+          tx.oncomplete = resolve;
+          tx.onerror = () => reject(tx.error);
+          tx.onabort = () => reject(tx.error);
+        });
+      } finally {
+        db.close();
+      }
+    }
+
     function showError(text) {
       errorMsg.textContent = text;
       errorMsg.classList.remove("hidden");
@@ -199,6 +235,15 @@
 
       ctaBtn.classList.add("opacity-70", "pointer-events-none");
       ctaLabel.textContent = "Preparando...";
+
+      try {
+        await storeFiles(valid);
+      } catch (e) {
+        ctaBtn.classList.remove("opacity-70", "pointer-events-none");
+        ctaLabel.textContent = "Elegir facturas";
+        showError("No se pudieron preparar los archivos en este navegador.");
+        return;
+      }
 
       const entries = await Promise.all(valid.map(fileToEntry));
       const stored = persist(entries);

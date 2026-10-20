@@ -1,0 +1,25 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        UID: ${UID:-1000}
+    image: impresion-facturas:latest
+    container_name: impresion-facturas
+    ports:
+      - "8000:8000"
+    environment:
+      FACTURAS_TMP: /tmp/facturas_temp
+    volumes:
+      - ./salida:/tmp/facturas_temp
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/', timeout=3).status == 200 else 1)
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

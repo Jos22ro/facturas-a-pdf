@@ -150,8 +150,10 @@
 
     if (isDemo) {
       const savedNotice = sessionStorage.getItem("fp_notice");
-      notice.textContent = savedNotice || "Vista previa de demostración: selecciona un lote para probar el flujo.";
+      notice.textContent = savedNotice || "Vista previa de demostración: elige facturas reales para enviarlas a imprimir.";
       notice.classList.remove("hidden");
+      document.getElementById("submit-print-btn").innerHTML =
+        '<span class="material-symbols-outlined text-[22px]">upload_file</span><span>Elegir facturas</span>';
     } else if (sessionStorage.getItem("fp_notice")) {
       notice.textContent = sessionStorage.getItem("fp_notice");
       notice.classList.remove("hidden");
@@ -203,7 +205,7 @@
       toggleBtn.textContent = selectedCount === 0 || selectedCount === total ? "Seleccionar todas" : "Deseleccionar todas";
 
       const printCount = document.getElementById("print-count");
-      printCount.textContent = selectedCount;
+      if (printCount) printCount.textContent = selectedCount;
 
       const submitBtn = document.getElementById("submit-print-btn");
       if (selectedCount === 0) submitBtn.classList.add("opacity-40", "pointer-events-none");
@@ -252,6 +254,10 @@
     document.getElementById("submit-print-btn").addEventListener("click", () => {
       const selectedCount = files.filter((file, index) => selection["card-" + index]).length;
       if (!selectedCount) return;
+      if (isDemo) {
+        window.location.href = "index.html";
+        return;
+      }
       persistSelection();
       const btn = document.getElementById("submit-print-btn");
       btn.classList.add("opacity-70", "pointer-events-none");
